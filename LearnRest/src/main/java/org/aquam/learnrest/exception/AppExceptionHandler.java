@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 
@@ -19,9 +18,5 @@ public class AppExceptionHandler {
     }
 
     // ?????????
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<Object> handleIOException(IOException e) {
-        AppException apiException = new AppException("IO EXCEPTION", HttpStatus.BAD_REQUEST, ZonedDateTime.now());
-        return new ResponseEntity<>(apiException, HttpStatus.BAD_REQUEST);
-    }
+    // how to handle IOEXCEPTION and checked exceptions
 }

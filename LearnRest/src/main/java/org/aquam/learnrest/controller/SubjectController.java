@@ -44,7 +44,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/delete/{subjectId}")
-    public ResponseEntity<Void> deleteSubject(@PathVariable Long subjectId) {
+    public ResponseEntity<Void> deleteSubjectById(@PathVariable Long subjectId) {
         subjectService.deleteById(subjectId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);   // 204 - No Content
     }

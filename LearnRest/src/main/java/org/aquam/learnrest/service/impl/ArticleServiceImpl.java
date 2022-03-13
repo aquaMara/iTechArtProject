@@ -35,22 +35,31 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void create(Article article, MultipartFile file) throws IOException {
+    public Article create(Article article, MultipartFile file) throws IOException {
         if (articleRepository.findById(article.getArticleId()).isEmpty()) {
             article.setFilePath(uploadImage(file));
-            articleRepository.save(article);
+            return articleRepository.save(article);
         }
+        return null;
     }
 
     @Override
-    public void update(Article article) {
-
+    public Article update(Article article) {
+        if (articleRepository.findById(article.getArticleId()).isPresent())
+            return articleRepository.save(article);
+        return null;
     }
 
     @Override
     public void delete(Article article) {
         if (articleRepository.findById(article.getArticleId()).isPresent())
-            articleRepository.save(article);
+            articleRepository.delete(article);
+    }
+
+    @Override
+    public void deleteById(Long articleId) {
+        if (articleRepository.findById(articleId).isPresent())
+            articleRepository.deleteById(articleId);
     }
 
     @Override

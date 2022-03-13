@@ -8,9 +8,9 @@ public interface UserService {
 
     AppUser findById(Long id);
     List<AppUser> findAll();
-    void create(AppUser user);
-    void update(AppUser user);
+    AppUser update(AppUser user);
     void delete(AppUser user);
-    void registerUser(AppUser user);
+    void deleteById(Long userId);
+    AppUser registerUser(AppUser user);
 
 }

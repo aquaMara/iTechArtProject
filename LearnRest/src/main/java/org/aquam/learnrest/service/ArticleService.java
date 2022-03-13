@@ -10,9 +10,10 @@ public interface ArticleService {
 
     Article findById(Long articleId);
     List<Article> findAll();
-    void create(Article article, MultipartFile file) throws IOException;
-    void update(Article article);
+    Article create(Article article, MultipartFile file) throws IOException;
+    Article update(Article article);
     void delete(Article article);
+    void deleteById(Long articleId);
 
     String uploadImage(MultipartFile file) throws IOException;
 }

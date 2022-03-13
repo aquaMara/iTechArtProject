@@ -40,7 +40,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     // fields to update : username, email, name
     @Override
-    public void update(AppUser user) {
+    public AppUser update(AppUser user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent())
+            return userRepository.save(user);
+        return null;
     }
 
     @Override
@@ -49,18 +52,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             userRepository.delete(user);
     }
 
-    @Override
-    public void create(AppUser user) {
-        if (userRepository.findByUsername(user.getUsername()).isEmpty())
-            registerUser(user);
-    }
-
     // обработать исключение, если не создался?
     @Override
-    public void registerUser(AppUser user) {
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        create(user);
+    public AppUser registerUser(AppUser user) {
+        if (userRepository.findByUsername(user.getUsername()).isEmpty()) {
+            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+            userRepository.save(user);
+        }
+        // throw new UsernameNotFoundException("h");
+        return null;
     }
 
+    @Override
+    public void deleteById(Long userId) {
+        if (userRepository.findById(userId).isPresent())
+            userRepository.deleteById(userId);
+    }
 }

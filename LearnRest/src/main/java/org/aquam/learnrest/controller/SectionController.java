@@ -18,29 +18,29 @@ public class SectionController {
     private final SectionServiceImpl sectionService;
 
     @GetMapping("")
-    public ResponseEntity<List<Section>> getAllSubjects() {
+    public ResponseEntity<List<Section>> getAllSections() {
         return new ResponseEntity<>(sectionService.findAll(), HttpStatus.OK);
     }
 
     // По идее не нужно
     @GetMapping("/{sectionId}")
-    public ResponseEntity<Section> getSubjectById(@PathVariable Long sectionId) {
+    public ResponseEntity<Section> getSectiobById(@PathVariable Long sectionId) {
         return new ResponseEntity<>(sectionService.findById(sectionId), HttpStatus.OK);
     }
 
     // , @RequestBody Subject subject
     @PostMapping(value = "/create")
-    public ResponseEntity<Section> createSubject(@RequestBody Section section) {
+    public ResponseEntity<Section> createSection(@RequestBody Section section) {
         return new ResponseEntity<>(sectionService.create(section), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Section> updateSubject(@RequestBody Section section) {
+    public ResponseEntity<Section> updateSection(@RequestBody Section section) {
         return new ResponseEntity<>(sectionService.update(section), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{sectionId}")
-    public ResponseEntity<Void> deleteSubject(@PathVariable Long sectionId) {
+    public ResponseEntity<Void> deleteSectionById(@PathVariable Long sectionId) {
         sectionService.deleteById(sectionId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
