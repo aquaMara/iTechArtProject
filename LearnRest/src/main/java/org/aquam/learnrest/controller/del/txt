@@ -1,0 +1,7 @@
+@RestController
+@RequestMapping("/learn")
+
+@GetMapping("/logout-success")
+public String logoutPage() {
+        return "logout";
+        }
