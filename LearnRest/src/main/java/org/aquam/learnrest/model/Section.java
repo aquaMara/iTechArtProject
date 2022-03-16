@@ -1,6 +1,7 @@
 package org.aquam.learnrest.model;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,9 +18,10 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long sectionId;
-    private String name;
+    private String sectionName;
 
     @ManyToOne
+    // @Cascade(CascadeType.ALL)
     private Subject subject;
 
     @OneToMany(mappedBy = "section")
@@ -34,7 +36,7 @@ public class Section {
     public String toString() {
         return "Section{" +
                 "sectionId=" + sectionId +
-                ", sectionName='" + name + '\'' +
+                ", sectionName='" + sectionName + '\'' +
                 '}';
     }
 }

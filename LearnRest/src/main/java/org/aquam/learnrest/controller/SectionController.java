@@ -22,26 +22,24 @@ public class SectionController {
         return new ResponseEntity<>(sectionService.findAll(), HttpStatus.OK);
     }
 
-    // По идее не нужно
     @GetMapping("/{sectionId}")
-    public ResponseEntity<Section> getSectiobById(@PathVariable Long sectionId) {
+    public ResponseEntity<Section> getSectionById(@PathVariable Long sectionId) {
         return new ResponseEntity<>(sectionService.findById(sectionId), HttpStatus.OK);
     }
 
     // , @RequestBody Subject subject
-    @PostMapping(value = "/create")
-    public ResponseEntity<Section> createSection(@RequestBody Section section) {
-        return new ResponseEntity<>(sectionService.create(section), HttpStatus.CREATED);
+    @PostMapping("")
+    public ResponseEntity<Section> createSection(Section section, Subject subject) {
+        return new ResponseEntity<>(sectionService.create(section, subject), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Section> updateSection(@RequestBody Section section) {
-        return new ResponseEntity<>(sectionService.update(section), HttpStatus.OK);
+    @PutMapping("/{sectionId}")
+    public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, Section newSection, Subject newSubject) {
+        return new ResponseEntity<>(sectionService.updateById(sectionId, newSection, newSubject), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{sectionId}")
-    public ResponseEntity<Void> deleteSectionById(@PathVariable Long sectionId) {
-        sectionService.deleteById(sectionId);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{sectionId}")
+    public ResponseEntity<Boolean> deleteSectionById(@PathVariable Long sectionId) {
+        return new ResponseEntity(sectionService.deleteById(sectionId), HttpStatus.OK);
     }
 }

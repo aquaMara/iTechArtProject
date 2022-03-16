@@ -1,6 +1,7 @@
 package org.aquam.learnrest.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.aquam.learnrest.model.AppUser;
 import org.aquam.learnrest.model.Article;
 import org.aquam.learnrest.service.impl.ArticleServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -29,21 +30,23 @@ public class ArticleController {
         return new ResponseEntity<>(articleService.findById(articleId), HttpStatus.OK);
     }
 
-    // @ModelAttribute("subject")Subject subject, @ModelAttribute("section")Section section
-    @PostMapping("/create")
-    ResponseEntity<Article> createArticle(@RequestBody Article article, @RequestBody MultipartFile file) throws IOException {
-        return new ResponseEntity<>(articleService.create(article, file), HttpStatus.CREATED);
+    @PostMapping("")
+    ResponseEntity<Article> createArticle(Article article, MultipartFile file, Long sectionId, AppUser user) throws IOException {
+        return new ResponseEntity<>(articleService.create(article, file, sectionId, user), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
-    ResponseEntity<Article> updateArticle(@RequestBody Article article) {
-        return new ResponseEntity<>(articleService.update(article), HttpStatus.OK);
+    @PutMapping("/{articleId}")
+    ResponseEntity<Article> updateArticle(@PathVariable Long articleId, Article article, Long sectionId) {
+        return new ResponseEntity<>(articleService.updateById(articleId, article, sectionId), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{articleId}")
-    ResponseEntity<Void> deleteArticleById(@PathVariable Long articleId) {
-        articleService.deleteById(articleId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{articleId}")
+    ResponseEntity<Boolean> deleteArticleById(@PathVariable Long articleId) {
+        return new ResponseEntity<>(articleService.deleteById(articleId), HttpStatus.OK);
     }
 
 }
+/*
+get, post = /api/articles
+get, put, delete = /api/articles/{id}
+ */

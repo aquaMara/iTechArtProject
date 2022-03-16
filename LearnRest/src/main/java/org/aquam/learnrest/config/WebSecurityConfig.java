@@ -35,11 +35,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()   // ENABLE
                 .authorizeRequests()
                 // эти всем разрешены - тут url
-                    .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**", "/uploads/**", "/icons/**").permitAll()
-                    .antMatchers("/learn", "/learn/login", "/learn/register/**").permitAll()
+                    .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**", "/subject_images/**", "/article_images/**").permitAll()
+                    .antMatchers("/learn", "/learn/login", "/learn/register").permitAll()
                 .antMatchers("/learn/subjects/**").permitAll()
+                .antMatchers("learn/subjects/**", "learn/sections/**").permitAll()
                 // любой другой запрос (any) только для authenticated
-                    .anyRequest().authenticated()
+                    //.anyRequest().authenticated()
                 // а тут настройки для входа и выхода
                 //.and().formLogin().loginPage("/learn/login").permitAll()
                 .and().formLogin().loginPage("/learn/login").defaultSuccessUrl("/learn/home", true)

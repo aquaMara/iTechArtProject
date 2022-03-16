@@ -1,7 +1,7 @@
 package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.aquam.learnrest.exception.AppRequestException;
+import org.aquam.learnrest.exception.EmptyInputException;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SubjectRepository;
 import org.aquam.learnrest.service.SubjectService;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,60 +23,61 @@ import java.util.List;
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final String ERROR_MESSAGE = "Subject not found###";
     public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
+    private final String ID_ERROR_MESSAGE = "Subject with id: %s not found";
+    private final String NAME_ERROR_MESSAGE = "Subject with name: %s not found";
+    private final String NULL_POINTER_ERROR_MESSAGE = "There are no subjects";
+    private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
+    private final String NOT_SAVED_ERROR_MESSAGE = "Subject can not be saved";
+    private final String EXISTS_ERROR_MESSAGE = "Subject with name:%s already exists";
 
     @Override
     public Subject findById(Long subjectId) {
-        return subjectRepository.findById(subjectId).orElseThrow(() -> new AppRequestException(ERROR_MESSAGE));
-        // return subjectRepository.findById(subjectId).orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE));
+        return subjectRepository.findById(subjectId).orElseThrow(() -> new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId)));
     }
 
     @Override
     public Subject findByName(String name) {
-        return subjectRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE));
+        return subjectRepository.findBySubjectName(name).orElseThrow(() -> new EntityNotFoundException(String.format(NAME_ERROR_MESSAGE, name)));
     }
 
     @Override
     public List<Subject> findAll() {
+        if (subjectRepository.findAll().isEmpty())
+            throw new NullPointerException(NULL_POINTER_ERROR_MESSAGE);
         return subjectRepository.findAll();
     }
 
     @Override
     public Subject create(Subject subject, MultipartFile file) throws IOException {
-        if (!subject.getName().isEmpty() && !subject.getName().isBlank()) {
-            if (subjectRepository.findByName(subject.getName()).isEmpty()) {
-                subject.setFilePath(uploadImage(file));
-                return subjectRepository.save(subject);
-            }
-        }
-        return null;
-    }
-
-    // отправила с формы предмет с тем же айди но с другим именем
-    @Override
-    public Subject update(Subject subject) {
-        /*
-        if (subjectRepository.findById(subject.getSubjectId()).isPresent()) {
-            subjectRepository.getById(subject.getSubjectId()).setName(subject.getName());
+        if (subject.getSubjectName() == null || subject.getSubjectName().isBlank() || file == null)
+            throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
+        if (subjectRepository.findBySubjectName(subject.getSubjectName()).isEmpty()) {
+            subject.setFilePath(uploadImage(file));
             return subjectRepository.save(subject);
         }
-         */
-        if (subjectRepository.findById(subject.getSubjectId()).isPresent())
-            subjectRepository.save(subject);
-        return null;
+        throw new EntityExistsException(String.format(EXISTS_ERROR_MESSAGE, subject.getSubjectName()));
     }
 
     @Override
-    public void delete(Subject subject) {
-        if (subjectRepository.findById(subject.getSubjectId()).isPresent())
-            subjectRepository.delete(subject);
+    public Subject updateById(Long subjectId, Subject newSubject) {
+        if (newSubject.getSubjectName() == null || newSubject.getSubjectName().isBlank())
+            throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
+        if (subjectRepository.findById(subjectId).isPresent()) {
+            Subject subject = subjectRepository.getById(subjectId);
+            subject.setSubjectName(newSubject.getSubjectName());
+            return subject;
+        }
+        throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
     }
 
     @Override
-    public void deleteById(Long subjectId) {
-        if (subjectRepository.findById(subjectId).isPresent())
+    public boolean deleteById(Long subjectId) {
+        if (subjectRepository.findById(subjectId).isPresent()) {
             subjectRepository.deleteById(subjectId);
+            return true;
+        }
+        throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
     }
 
     // try catch VS throws

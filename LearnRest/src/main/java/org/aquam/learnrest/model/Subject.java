@@ -18,7 +18,7 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long subjectId;
     @Column(unique = true)
-    private String name;
+    private String subjectName;
     private String filePath;
 
     @OneToMany(mappedBy = "subject")
@@ -41,7 +41,7 @@ public class Subject {
     public String toString() {
         return "Subject{" +
                 "subjectId=" + subjectId +
-                ", subjectName='" + name + '\'' +
+                ", subjectName='" + subjectName + '\'' +
                 '}';
     }
 }

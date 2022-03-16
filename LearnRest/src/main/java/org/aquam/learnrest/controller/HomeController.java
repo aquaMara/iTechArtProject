@@ -18,14 +18,4 @@ public class HomeController {
 
     private final SubjectServiceImpl subjectService;
 
-    @GetMapping("")
-    public ResponseEntity<List<Subject>> getAllSubjects() {
-        return new ResponseEntity<>(subjectService.findAll(), HttpStatus.OK);
-    }
-
-    @GetMapping("/home")
-    public ResponseEntity<Subject> getAll() {
-        // all subjects + all articles + user account
-        return null;
-    }
 }
