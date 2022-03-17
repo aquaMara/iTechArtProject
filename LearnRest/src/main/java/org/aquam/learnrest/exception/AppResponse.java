@@ -1,21 +1,19 @@
 package org.aquam.learnrest.exception;
 
+import org.aquam.learnrest.dto.UserDTO;
 import org.springframework.http.HttpStatus;
 
+import javax.validation.ConstraintViolation;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AppResponse {
 
     private String message;
     private ZonedDateTime zonedDateTime;
     private HttpStatus httpStatus;
-    private Throwable throwable;
-    private Throwable cause;
-
-    public AppResponse(String message, ZonedDateTime zonedDateTime) {
-        this.message = message;
-        this.zonedDateTime = zonedDateTime;
-    }
+    private Set<ConstraintViolation<?>> validationExceptions;
 
     public AppResponse(String message, ZonedDateTime zonedDateTime, HttpStatus httpStatus) {
         this.message = message;
@@ -23,24 +21,11 @@ public class AppResponse {
         this.httpStatus = httpStatus;
     }
 
-    public AppResponse(String message, ZonedDateTime zonedDateTime, Throwable throwable) {
-        this.message = message;
-        this.zonedDateTime = zonedDateTime;
-        this.throwable = throwable;
-    }
-
-    public AppResponse(String message, ZonedDateTime zonedDateTime, Throwable throwable, Throwable cause) {
-        this.message = message;
-        this.zonedDateTime = zonedDateTime;
-        this.throwable = throwable;
-        this.cause = cause;
-    }
-
-    public AppResponse(String message, ZonedDateTime zonedDateTime, HttpStatus httpStatus, Throwable throwable) {
+    public AppResponse(String message, ZonedDateTime zonedDateTime, HttpStatus httpStatus, Set<ConstraintViolation<?>> validationExceptions) {
         this.message = message;
         this.zonedDateTime = zonedDateTime;
         this.httpStatus = httpStatus;
-        this.throwable = throwable;
+        this.validationExceptions = validationExceptions;
     }
 
     public String getMessage() {
@@ -53,13 +38,5 @@ public class AppResponse {
 
     public HttpStatus getHttpStatus() {
         return httpStatus;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    public Throwable getCause() {
-        return cause;
     }
 }

@@ -1,6 +1,7 @@
 package org.aquam.learnrest.model;
 
 import lombok.*;
+import org.aquam.learnrest.dto.SubjectDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,14 +28,6 @@ public class Subject {
     public void addSection(Section section) {
         this.allSections.add(section);
         section.setSubject(this);
-    }
-
-    @OneToMany(mappedBy = "subject")
-    List<Article> allArticles = new ArrayList<>();
-
-    public void addArticle(Article article) {
-        this.allArticles.add(article);
-        article.setSubject(this);
     }
 
     @Override

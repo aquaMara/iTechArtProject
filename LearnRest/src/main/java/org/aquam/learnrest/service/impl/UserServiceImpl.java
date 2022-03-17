@@ -1,6 +1,8 @@
 package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.aquam.learnrest.dto.UserDTO;
+import org.aquam.learnrest.dto.mapper.UserMapper;
 import org.aquam.learnrest.model.AppUser;
 import org.aquam.learnrest.repository.UserRepository;
 import org.aquam.learnrest.service.UserService;
@@ -21,6 +23,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final String USERNAME_ERROR_MESSAGE = "User with username: %s not found";
     private final String ID_ERROR_MESSAGE = "User with id: %s not found";
@@ -57,6 +60,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public AppUser updateById(Long userId, UserDTO changedUserDTO) {
+        AppUser changedUser = userMapper.toUser(changedUserDTO);
+        if (userId == null || userRepository.findById(userId).isEmpty())
+            throw new EntityNotFoundException(String.format("User with id: %s is not found", userId));
+        AppUser oldUser = userRepository.getById(userId);
+        oldUser.setUsername(changedUser.getUsername());
+        oldUser.setPassword(changedUser.getPassword());
+        oldUser.setName(changedUser.getName());
+        oldUser.setEmail(changedUser.getEmail());
+        return oldUser;
+    }
+
+    @Override
     public AppUser registerUser(AppUser user) {
         if (userRepository.findByUsername(user.getUsername()).isEmpty()) {
             String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -64,6 +80,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return userRepository.save(user);
         }
         throw new EntityExistsException(String.format(EXISTS_ERROR_MESSAGE, user.getUsername()));
+    }
+
+    @Override
+    public AppUser registerUser(UserDTO userDTO) {
+        AppUser user = userMapper.toUser(userDTO);
+        if (userRepository.findByUsername(user.getUsername()).isPresent())
+            throw new EntityExistsException(String.format("User with username: %s already exists", user.getUsername()));
+        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        return userRepository.save(user);
     }
 
     @Override

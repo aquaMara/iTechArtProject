@@ -21,7 +21,6 @@ public class Section {
     private String sectionName;
 
     @ManyToOne
-    // @Cascade(CascadeType.ALL)
     private Subject subject;
 
     @OneToMany(mappedBy = "section")

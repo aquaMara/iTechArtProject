@@ -1,5 +1,6 @@
 package org.aquam.learnrest.service;
 
+import org.aquam.learnrest.dto.SubjectDTO;
 import org.aquam.learnrest.model.Subject;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +13,9 @@ public interface SubjectService {
     Subject findByName(String name);
     List<Subject> findAll();
     Subject create(Subject subject, MultipartFile file) throws IOException;
+    Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException;
     Subject updateById(Long subjectId, Subject newSubject);
+    Subject updateById(Long subjectId, SubjectDTO newSubjectDTO);
     boolean deleteById(Long subjectId);
 
     String uploadImage(MultipartFile file) throws IOException;

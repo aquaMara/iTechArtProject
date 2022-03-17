@@ -1,6 +1,8 @@
 package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.aquam.learnrest.dto.SubjectDTO;
+import org.aquam.learnrest.dto.mapper.SubjectMapper;
 import org.aquam.learnrest.exception.EmptyInputException;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SubjectRepository;
@@ -23,6 +25,7 @@ import java.util.List;
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
+    private final SubjectMapper subjectMapper;
     public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
     private final String ID_ERROR_MESSAGE = "Subject with id: %s not found";
     private final String NAME_ERROR_MESSAGE = "Subject with name: %s not found";
@@ -48,6 +51,7 @@ public class SubjectServiceImpl implements SubjectService {
         return subjectRepository.findAll();
     }
 
+    // no
     @Override
     public Subject create(Subject subject, MultipartFile file) throws IOException {
         if (subject.getSubjectName() == null || subject.getSubjectName().isBlank() || file == null)
@@ -59,6 +63,18 @@ public class SubjectServiceImpl implements SubjectService {
         throw new EntityExistsException(String.format(EXISTS_ERROR_MESSAGE, subject.getSubjectName()));
     }
 
+    @Override
+    public Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException {
+        if (file == null)
+            throw new NullPointerException("File is null");
+        Subject subject = subjectMapper.mapToSubject(subjectDTO);
+        if (subjectRepository.findBySubjectName(subject.getSubjectName()).isPresent())
+            throw new EntityExistsException(String.format(NAME_ERROR_MESSAGE, subject.getSubjectName()));
+        subject.setFilePath(uploadImage(file));
+        return subjectRepository.save(subject);
+    }
+
+    // no
     @Override
     public Subject updateById(Long subjectId, Subject newSubject) {
         if (newSubject.getSubjectName() == null || newSubject.getSubjectName().isBlank())
@@ -72,12 +88,22 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public boolean deleteById(Long subjectId) {
-        if (subjectRepository.findById(subjectId).isPresent()) {
-            subjectRepository.deleteById(subjectId);
-            return true;
+    public Subject updateById(Long subjectId, SubjectDTO newSubjectDTO) {
+        if (subjectId == null || subjectRepository.findById(subjectId).isEmpty()) {
+            throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
         }
-        throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
+        Subject newSubject = subjectMapper.mapToSubject(newSubjectDTO);
+        Subject subject = subjectRepository.getById(subjectId);
+        subject.setSubjectName(newSubject.getSubjectName());
+        return subject;
+    }
+
+    @Override
+    public boolean deleteById(Long subjectId) {
+        if (subjectRepository.findById(subjectId).isEmpty())
+            throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
+        subjectRepository.deleteById(subjectId);
+        return true;
     }
 
     // try catch VS throws

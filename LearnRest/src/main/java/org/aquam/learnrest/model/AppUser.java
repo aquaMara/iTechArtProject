@@ -37,7 +37,6 @@ public class AppUser implements UserDetails {
     @NotBlank(message = "Can not be empty")
     @Email(message = "Valid only")
     private String email;
-    private int numberOfArticles;   // only for UserRole.TEACHER, others = 0
     private boolean locked;
     private boolean enabled;
 
@@ -50,7 +49,6 @@ public class AppUser implements UserDetails {
     }
 
     public AppUser() {
-        this.numberOfArticles = 0;
         this.locked = false;
         this.enabled = true;
     }
@@ -109,8 +107,6 @@ public class AppUser implements UserDetails {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", numberOfArticles=" + numberOfArticles +
-                '}';
+                ", email='" + email + '\'' + '}';
     }
 }

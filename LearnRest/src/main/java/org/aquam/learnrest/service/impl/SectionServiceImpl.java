@@ -1,6 +1,8 @@
 package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.aquam.learnrest.dto.SectionDTO;
+import org.aquam.learnrest.dto.mapper.SectionMapper;
 import org.aquam.learnrest.exception.EmptyInputException;
 import org.aquam.learnrest.model.Section;
 import org.aquam.learnrest.model.Subject;
@@ -20,6 +22,7 @@ public class SectionServiceImpl implements SectionService {
 
     private final SectionRepository sectionRepository;
     private final SubjectRepository subjectRepository;
+    private final SectionMapper sectionMapper;
     private final String ID_ERROR_MESSAGE = "Section with id: %s not found";
     private final String NULL_POINTER_ERROR_MESSAGE = "There are no sections";
     private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
@@ -51,6 +54,17 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
+    public Section create(SectionDTO sectionDTO) {
+        Section section = sectionMapper.toSection(sectionDTO);
+        if (subjectRepository.findById(sectionDTO.getSubjectId()).isEmpty()) {
+            throw new EntityNotFoundException(String.format("Subject with id: %s not found", sectionDTO.getSubjectId()));
+        }
+        Subject loadedSubject = subjectRepository.getById(sectionDTO.getSubjectId());
+        section.setSubject(loadedSubject);
+        return sectionRepository.save(section);
+    }
+
+    @Override
     public Section updateById(Long sectionId, Section newSection, Subject newSubject) {
         if (newSection.getSectionName() == null || newSubject.getSubjectName() == null
                 || newSection.getSectionName().isBlank() || newSubject.getSubjectName().isBlank())
@@ -65,6 +79,22 @@ public class SectionServiceImpl implements SectionService {
             return section;
         }
         throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, sectionId));
+    }
+
+    @Override
+    public Section updateById(Long sectionId, SectionDTO newSectionDTO) {
+        if (sectionId == null || sectionRepository.findById(sectionId).isEmpty()) {
+            throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, sectionId));
+        }
+        Section newSection = sectionMapper.toSection(newSectionDTO);
+        Section oldSection = sectionRepository.getById(sectionId);
+        if (subjectRepository.findById(newSectionDTO.getSubjectId()).isEmpty()) {
+            throw new EntityNotFoundException(String.format("Subject with id: %s not found", newSectionDTO.getSubjectId()));
+        }
+        Subject loadedSubject = subjectRepository.getById(newSectionDTO.getSubjectId());
+        oldSection.setSectionName(newSection.getSectionName());
+        oldSection.setSubject(loadedSubject);
+        return oldSection;
     }
 
     @Override

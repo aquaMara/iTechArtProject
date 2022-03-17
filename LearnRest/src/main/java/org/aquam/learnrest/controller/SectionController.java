@@ -1,6 +1,7 @@
 package org.aquam.learnrest.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.aquam.learnrest.dto.SectionDTO;
 import org.aquam.learnrest.model.Section;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.service.impl.SectionServiceImpl;
@@ -27,15 +28,28 @@ public class SectionController {
         return new ResponseEntity<>(sectionService.findById(sectionId), HttpStatus.OK);
     }
 
+    /*
     // , @RequestBody Subject subject
     @PostMapping("")
     public ResponseEntity<Section> createSection(Section section, Subject subject) {
         return new ResponseEntity<>(sectionService.create(section, subject), HttpStatus.CREATED);
     }
+     */
 
+    @PostMapping("")
+    public ResponseEntity<Section> createSection(SectionDTO sectionDTO) {
+        return new ResponseEntity<>(sectionService.create(sectionDTO), HttpStatus.CREATED);
+    }
+
+    /*
     @PutMapping("/{sectionId}")
     public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, Section newSection, Subject newSubject) {
         return new ResponseEntity<>(sectionService.updateById(sectionId, newSection, newSubject), HttpStatus.OK);
+    }
+     */
+    @PutMapping("/{sectionId}")
+    public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, SectionDTO newSectionDTO) {
+        return new ResponseEntity<>(sectionService.updateById(sectionId, newSectionDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{sectionId}")

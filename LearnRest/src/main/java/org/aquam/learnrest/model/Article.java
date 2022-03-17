@@ -30,9 +30,6 @@ public class Article {
     private AppUser user;
 
     @ManyToOne
-    private Subject subject;
-
-    @ManyToOne
     private Section section;
 
     @Override
