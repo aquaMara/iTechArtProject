@@ -30,6 +30,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final String EXISTS_ERROR_MESSAGE = "User with username: %s already exists";
     private final String NULL_POINTER_ERROR_MESSAGE = "There are no users";
 
+    // for web security
+    // там на основе пользователя создаётся другой jwtUser, который implements UserDetails
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(String.format(USERNAME_ERROR_MESSAGE, username)));

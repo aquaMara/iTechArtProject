@@ -1,9 +1,6 @@
 package org.aquam.learnrest.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +18,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @Entity
+//@Builder
 public class AppUser implements UserDetails {
 
     @Id
@@ -40,7 +38,7 @@ public class AppUser implements UserDetails {
     private boolean locked;
     private boolean enabled;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Article> allArticles = new ArrayList<>();
 
     private void addArticle(Article article) {
@@ -108,5 +106,9 @@ public class AppUser implements UserDetails {
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' + '}';
+    }
+
+    public AppUser build() {
+        return new AppUser(userRole, username, password, name, email);
     }
 }
