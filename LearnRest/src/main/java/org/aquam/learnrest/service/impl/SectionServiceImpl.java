@@ -9,6 +9,7 @@ import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SectionRepository;
 import org.aquam.learnrest.repository.SubjectRepository;
 import org.aquam.learnrest.service.SectionService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +23,13 @@ public class SectionServiceImpl implements SectionService {
 
     private final SectionRepository sectionRepository;
     private final SubjectRepository subjectRepository;
-    private final SectionMapper sectionMapper;
     private final String ID_ERROR_MESSAGE = "Section with id: %s not found";
     private final String NULL_POINTER_ERROR_MESSAGE = "There are no sections";
     private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
     private final String NOT_SAVED_ERROR_MESSAGE = "Section can not be saved";
     private final String EXISTS_ERROR_MESSAGE = "Section with id:%s already exists";
+
+    private final ModelMapper modelMapper;
 
     @Override
     public Section findById(Long sectionId) {
@@ -55,7 +57,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public Section create(SectionDTO sectionDTO) {
-        Section section = sectionMapper.toSection(sectionDTO);
+        Section section = toSection(sectionDTO);
         if (subjectRepository.findById(sectionDTO.getSubjectId()).isEmpty()) {
             throw new EntityNotFoundException(String.format("Subject with id: %s not found", sectionDTO.getSubjectId()));
         }
@@ -86,7 +88,7 @@ public class SectionServiceImpl implements SectionService {
         if (sectionId == null || sectionRepository.findById(sectionId).isEmpty()) {
             throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, sectionId));
         }
-        Section newSection = sectionMapper.toSection(newSectionDTO);
+        Section newSection = toSection(newSectionDTO);
         Section oldSection = sectionRepository.getById(sectionId);
         if (subjectRepository.findById(newSectionDTO.getSubjectId()).isEmpty()) {
             throw new EntityNotFoundException(String.format("Subject with id: %s not found", newSectionDTO.getSubjectId()));
@@ -104,5 +106,14 @@ public class SectionServiceImpl implements SectionService {
             return true;
         }
         throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, sectionId));
+    }
+
+    public Section toSection(SectionDTO sectionDTO) {
+        if (sectionDTO.getSectionName() == null || sectionDTO.getSubjectId() == null)   //  || sectionDTO.getSubjectName() == null
+            throw new NullPointerException("Section or subject is null");
+        if (sectionDTO.getSectionName().isBlank()) //  || sectionDTO.getSubjectName().isBlank()
+            throw new EmptyInputException("Section or subject name is blank");
+        Section section = modelMapper.map(sectionDTO, Section.class);
+        return section;
     }
 }

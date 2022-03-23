@@ -7,6 +7,7 @@ import org.aquam.learnrest.exception.EmptyInputException;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SubjectRepository;
 import org.aquam.learnrest.service.SubjectService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,6 @@ import java.util.List;
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final SubjectMapper subjectMapper;
     public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
     private final String ID_ERROR_MESSAGE = "Subject with id: %s not found";
     private final String NAME_ERROR_MESSAGE = "Subject with name: %s not found";
@@ -33,6 +33,8 @@ public class SubjectServiceImpl implements SubjectService {
     private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
     private final String NOT_SAVED_ERROR_MESSAGE = "Subject can not be saved";
     private final String EXISTS_ERROR_MESSAGE = "Subject with name:%s already exists";
+
+    private final ModelMapper modelMapper;
 
     @Override
     public Subject findById(Long subjectId) {
@@ -67,7 +69,7 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException {
         if (file == null)
             throw new NullPointerException("File is null");
-        Subject subject = subjectMapper.mapToSubject(subjectDTO);
+        Subject subject = toSubject(subjectDTO);
         if (subjectRepository.findBySubjectName(subject.getSubjectName()).isPresent())
             throw new EntityExistsException(String.format(NAME_ERROR_MESSAGE, subject.getSubjectName()));
         subject.setFilePath(uploadImage(file));
@@ -92,7 +94,7 @@ public class SubjectServiceImpl implements SubjectService {
         if (subjectId == null || subjectRepository.findById(subjectId).isEmpty()) {
             throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
         }
-        Subject newSubject = subjectMapper.mapToSubject(newSubjectDTO);
+        Subject newSubject = toSubject(newSubjectDTO);
         Subject subject = subjectRepository.getById(subjectId);
         subject.setSubjectName(newSubject.getSubjectName());
         return subject;
@@ -114,5 +116,14 @@ public class SubjectServiceImpl implements SubjectService {
         filename.append(file.getOriginalFilename());
         Files.write(filenameAndPath, file.getBytes());
         return filename.toString();
+    }
+
+    public Subject toSubject(SubjectDTO subjectDTO) {
+        if (subjectDTO.getSubjectName() == null)
+            throw new NullPointerException("Subject is null");
+        if (subjectDTO.getSubjectName().isBlank())
+            throw new EmptyInputException("Subject name is blank");
+        Subject subject = modelMapper.map(subjectDTO, Subject.class);
+        return subject;
     }
 }

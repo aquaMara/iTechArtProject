@@ -2,6 +2,8 @@ package org.aquam.learnrest.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -10,9 +12,9 @@ import lombok.*;
 public class SectionDTO {
 
     private Long sectionId;
+    @NotBlank(message = "Can not be empty")
     private String sectionName;
 
     private Long subjectId;
-    // private String subjectName;
 
 }

@@ -7,7 +7,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
 @ToString
 @Entity
 public class Article {

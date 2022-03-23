@@ -7,6 +7,7 @@ import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.service.impl.SectionServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,40 +19,31 @@ public class SectionController {
 
     private final SectionServiceImpl sectionService;
 
+    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<List<Section>> getAllSections() {
         return new ResponseEntity<>(sectionService.findAll(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
     @GetMapping("/{sectionId}")
     public ResponseEntity<Section> getSectionById(@PathVariable Long sectionId) {
         return new ResponseEntity<>(sectionService.findById(sectionId), HttpStatus.OK);
     }
 
-    /*
-    // , @RequestBody Subject subject
-    @PostMapping("")
-    public ResponseEntity<Section> createSection(Section section, Subject subject) {
-        return new ResponseEntity<>(sectionService.create(section, subject), HttpStatus.CREATED);
-    }
-     */
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<Section> createSection(SectionDTO sectionDTO) {
         return new ResponseEntity<>(sectionService.create(sectionDTO), HttpStatus.CREATED);
     }
 
-    /*
-    @PutMapping("/{sectionId}")
-    public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, Section newSection, Subject newSubject) {
-        return new ResponseEntity<>(sectionService.updateById(sectionId, newSection, newSubject), HttpStatus.OK);
-    }
-     */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{sectionId}")
     public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, SectionDTO newSectionDTO) {
         return new ResponseEntity<>(sectionService.updateById(sectionId, newSectionDTO), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{sectionId}")
     public ResponseEntity<Boolean> deleteSectionById(@PathVariable Long sectionId) {
         return new ResponseEntity(sectionService.deleteById(sectionId), HttpStatus.OK);

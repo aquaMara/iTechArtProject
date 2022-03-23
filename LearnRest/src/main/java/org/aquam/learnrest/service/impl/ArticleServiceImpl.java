@@ -11,6 +11,7 @@ import org.aquam.learnrest.repository.ArticleRepository;
 import org.aquam.learnrest.repository.SectionRepository;
 import org.aquam.learnrest.repository.UserRepository;
 import org.aquam.learnrest.service.ArticleService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,13 +29,14 @@ import java.util.List;
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleMapper articleMapper;
     private final SectionRepository sectionRepository;
     private final UserRepository userRepository;
     public final String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/article_images";
     private final String ID_ERROR_MESSAGE = "Article with id: %s not found";
     private final String NULL_POINTER_ERROR_MESSAGE = "There are no articles";
     private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
+
+    private final ModelMapper modelMapper;
 
     @Override
     public Article findById(Long articleId) {
@@ -72,13 +74,13 @@ public class ArticleServiceImpl implements ArticleService {
     public Article create(ArticleDTO articleDTO, MultipartFile file) throws IOException {
         if (file == null)
             throw new NullPointerException("File is null");
-        Article article = articleMapper.toArticle(articleDTO);
+        Article article = toArticle(articleDTO);
         if (sectionRepository.findById(articleDTO.getSectionId()).isEmpty())
             throw new EntityNotFoundException(String.format("Section with id: %s not found", articleDTO.getSectionId()));
         if (userRepository.findById(articleDTO.getUserId()).isEmpty())
             throw new EntityNotFoundException(String.format("User with id: %s not found", articleDTO.getUserId()));
         article.setFilePath(uploadImage(file));
-        article.setSection(sectionRepository.getById(articleDTO.getSectionId()));
+        // article.setSection(sectionRepository.getById(articleDTO.getSectionId()));
         article.setUser(userRepository.getById(articleDTO.getUserId()));
         return articleRepository.save(article);
     }
@@ -112,7 +114,7 @@ public class ArticleServiceImpl implements ArticleService {
             throw new EntityNotFoundException(String.format("Article with id: %s not found", articleId));
         }
         Article oldArticle = articleRepository.getById(articleId);
-        Article newArticle = articleMapper.toArticle(newArticleDTO);
+        Article newArticle = toArticle(newArticleDTO);
         if (sectionRepository.findById(newArticleDTO.getSectionId()).isEmpty())
             throw new EntityNotFoundException(String.format("Section with id: %s not found", newArticleDTO.getSectionId()));
         else
@@ -146,5 +148,24 @@ public class ArticleServiceImpl implements ArticleService {
         filename.append(file.getOriginalFilename());
         Files.write(filenameAndPath, file.getBytes());
         return filename.toString();
+    }
+
+    public Article toArticle(ArticleDTO articleDTO) {
+        if (articleDTO.getSectionId() == null || articleDTO.getUserId() == null
+                || articleDTO.getHeading() == null || articleDTO.getContent() == null)
+            throw new NullPointerException("Some fields are null");
+        if (articleDTO.getHeading().isBlank() || articleDTO.getContent().isBlank()
+                || articleDTO.getLink().isBlank() || articleDTO.getLiterature().isBlank())
+            throw new EmptyInputException("Some fields are blank");
+
+        Article article = modelMapper.map(articleDTO, Article.class);
+        return article;
+
+        /*
+        if (articleDTO.getLiterature() != null)
+            article.setLiterature(articleDTO.getLiterature());
+        if (articleDTO.getLink() != null)
+            article.setLink(articleDTO.getLink());
+         */
     }
 }

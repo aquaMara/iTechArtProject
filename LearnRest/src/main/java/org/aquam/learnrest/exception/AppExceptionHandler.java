@@ -64,13 +64,13 @@ public class AppExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /*
+
     // error 403
     @ExceptionHandler(JwtAuthenticationException.class)
     public ResponseEntity<AppResponse> handleJwtAuthenticationException(JwtAuthenticationException exception) {
         AppResponse response = new AppResponse(exception.getMessage(), ZonedDateTime.now(), HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
-     */
+
 
 }

@@ -16,7 +16,6 @@ public class SectionMapper {
         Section section = new Section();
         section.setSectionName(sectionDTO.getSectionName());
         return section;
-
     }
 
 }
