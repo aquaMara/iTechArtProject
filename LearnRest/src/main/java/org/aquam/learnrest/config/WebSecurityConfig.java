@@ -65,13 +65,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-    /*
     @Bean
     public FilterRegistrationBean hiddenHttpMethodFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new HiddenHttpMethodFilter());
         filterRegistrationBean.setUrlPatterns(Arrays.asList("/*"));
         return filterRegistrationBean;
     }
-     */
 
 }
