@@ -22,7 +22,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-@Transactional
+@Transactional  // ctrl + shift + T
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;

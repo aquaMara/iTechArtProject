@@ -15,7 +15,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @Entity
 //@Builder
 public class AppUser implements UserDetails {
