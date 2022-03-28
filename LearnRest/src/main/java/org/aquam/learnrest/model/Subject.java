@@ -1,11 +1,11 @@
 package org.aquam.learnrest.model;
 
 import lombok.*;
-import org.aquam.learnrest.dto.SubjectDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -40,5 +40,18 @@ public class Subject {
                 "subjectId=" + subjectId +
                 ", subjectName='" + subjectName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Subject subject = (Subject) o;
+        return Objects.equals(subjectName, subject.subjectName) && Objects.equals(filePath, subject.filePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subjectName, filePath);
     }
 }

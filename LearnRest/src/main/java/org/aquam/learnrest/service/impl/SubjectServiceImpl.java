@@ -2,8 +2,7 @@ package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.aquam.learnrest.dto.SubjectDTO;
-import org.aquam.learnrest.dto.mapper.SubjectMapper;
-import org.aquam.learnrest.exception.EmptyInputException;
+import org.aquam.learnrest.exception.EntitiesNotFoundException;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SubjectRepository;
 import org.aquam.learnrest.service.SubjectService;
@@ -14,11 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -26,89 +28,65 @@ import java.util.List;
 public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
-    public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
-    private final String ID_ERROR_MESSAGE = "Subject with id: %s not found";
-    private final String NAME_ERROR_MESSAGE = "Subject with name: %s not found";
-    private final String NULL_POINTER_ERROR_MESSAGE = "There are no subjects";
-    private final String EMPTY_INPUT_ERROR_MESSAGE = "Some fields are empty";
-    private final String NOT_SAVED_ERROR_MESSAGE = "Subject can not be saved";
-    private final String EXISTS_ERROR_MESSAGE = "Subject with name:%s already exists";
-
     private final ModelMapper modelMapper;
+    public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
+
+    private static Validator validator;
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.usingContext().getValidator();
+    }
 
     @Override
     public Subject findById(Long subjectId) {
-        return subjectRepository.findById(subjectId).orElseThrow(() -> new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId)));
+        return subjectRepository.findById(subjectId).orElseThrow(()
+                -> new EntityNotFoundException("Subject with id: " + subjectId + " not found"));
     }
 
     @Override
     public Subject findByName(String name) {
-        return subjectRepository.findBySubjectName(name).orElseThrow(() -> new EntityNotFoundException(String.format(NAME_ERROR_MESSAGE, name)));
+        return subjectRepository.findBySubjectName(name).orElseThrow(()
+                -> new EntityNotFoundException("Subject with name: " + name + " not found"));
     }
 
     @Override
     public List<Subject> findAll() {
+        /*
+        if (!subjectRepository.findAll().isEmpty())
+            return subjectRepository.findAll();
+        throw new EntitiesNotFoundException("There are no subjects");
+         */
         if (subjectRepository.findAll().isEmpty())
-            throw new NullPointerException(NULL_POINTER_ERROR_MESSAGE);
+            throw new EntitiesNotFoundException("There are no subjects");
         return subjectRepository.findAll();
     }
 
-    // no
-    @Override
-    public Subject create(Subject subject, MultipartFile file) throws IOException {
-        if (subject.getSubjectName() == null || subject.getSubjectName().isBlank() || file == null)
-            throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
-        if (subjectRepository.findBySubjectName(subject.getSubjectName()).isEmpty()) {
-            subject.setFilePath(uploadImage(file));
-            return subjectRepository.save(subject);
-        }
-        throw new EntityExistsException(String.format(EXISTS_ERROR_MESSAGE, subject.getSubjectName()));
-    }
-
+    // на фронт недейств пока файл не выбран
     @Override
     public Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException {
-        if (file == null)
-            throw new NullPointerException("File is null");
+        Optional<Subject> s = subjectRepository.findBySubjectName(subjectDTO.getSubjectName());
+        if (subjectRepository.findBySubjectName(subjectDTO.getSubjectName()).isPresent())
+            throw new EntityExistsException("Subject with name: " + subjectDTO.getSubjectName() + " already exists");
         Subject subject = toSubject(subjectDTO);
-        if (subjectRepository.findBySubjectName(subject.getSubjectName()).isPresent())
-            throw new EntityExistsException(String.format(NAME_ERROR_MESSAGE, subject.getSubjectName()));
-        subject.setFilePath(uploadImage(file));
+        // subject.setFilePath(uploadImage(file));
         return subjectRepository.save(subject);
     }
 
-    // no
-    @Override
-    public Subject updateById(Long subjectId, Subject newSubject) {
-        if (newSubject.getSubjectName() == null || newSubject.getSubjectName().isBlank())
-            throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
-        if (subjectRepository.findById(subjectId).isPresent()) {
-            Subject subject = subjectRepository.getById(subjectId);
-            subject.setSubjectName(newSubject.getSubjectName());
-            return subject;
-        }
-        throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
-    }
-
-    @Override
+    @Override   // без path variable и так не раб
     public Subject updateById(Long subjectId, SubjectDTO newSubjectDTO) {
-        if (subjectId == null || subjectRepository.findById(subjectId).isEmpty()) {
-            throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
-        }
+        Subject subject = findById(subjectId);
         Subject newSubject = toSubject(newSubjectDTO);
-        Subject subject = subjectRepository.getById(subjectId);
         subject.setSubjectName(newSubject.getSubjectName());
-        return subject;
+        return subjectRepository.save(subject);
     }
 
     @Override
     public boolean deleteById(Long subjectId) {
-        if (subjectRepository.findById(subjectId).isEmpty())
-            throw new EntityNotFoundException(String.format(ID_ERROR_MESSAGE, subjectId));
-        subjectRepository.deleteById(subjectId);
+        Subject subject = findById(subjectId);
+        subjectRepository.delete(subject);
         return true;
     }
 
-    // try catch VS throws
     @Override
     public String uploadImage(MultipartFile file) throws IOException {
         StringBuilder filename = new StringBuilder();
@@ -119,11 +97,15 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     public Subject toSubject(SubjectDTO subjectDTO) {
-        if (subjectDTO.getSubjectName() == null)
-            throw new NullPointerException("Subject is null");
-        if (subjectDTO.getSubjectName().isBlank())
-            throw new EmptyInputException("Subject name is blank");
+        Set<ConstraintViolation<SubjectDTO>> validationExceptions = validator.validate(subjectDTO);
+        if (!validationExceptions.isEmpty())
+            throw new ConstraintViolationException(validationExceptions);
         Subject subject = modelMapper.map(subjectDTO, Subject.class);
         return subject;
     }
 }
+
+        /*
+        if (subjectDTO == null)
+            throw new NullPointerException("Subject is null");
+         */

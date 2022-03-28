@@ -6,8 +6,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,9 +13,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @Entity
-//@Builder
 public class AppUser implements UserDetails {
 
     @Id
@@ -25,14 +21,9 @@ public class AppUser implements UserDetails {
     private Long userId;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-    @NotBlank(message = "Can not be empty")  // not null + no whitespaces
     private String username;
-    // @Length(min = 6, max = 16, message = "Between 6 and 16 characters")
     private String password;
-    @NotBlank(message = "Can not be empty")
     private String name;
-    @NotBlank(message = "Can not be empty")
-    @Email(message = "Valid only")
     private String email;
     private boolean locked;
     private boolean enabled;

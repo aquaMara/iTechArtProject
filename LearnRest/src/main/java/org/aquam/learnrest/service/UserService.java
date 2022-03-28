@@ -9,10 +9,8 @@ public interface UserService {
 
     AppUser findById(Long id);
     List<AppUser> findAll();
-    AppUser updateById(Long userId, AppUser changedUser);
     AppUser updateById(Long userId, UserDTO changedUserDTO);
     boolean deleteById(Long userId);
-    AppUser registerUser(AppUser user);
     AppUser registerUser(UserDTO userDTO);
 
 }

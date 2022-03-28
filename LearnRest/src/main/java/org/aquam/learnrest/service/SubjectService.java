@@ -12,9 +12,7 @@ public interface SubjectService {
     Subject findById(Long subjectId);
     Subject findByName(String name);
     List<Subject> findAll();
-    Subject create(Subject subject, MultipartFile file) throws IOException;
     Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException;
-    Subject updateById(Long subjectId, Subject newSubject);
     Subject updateById(Long subjectId, SubjectDTO newSubjectDTO);
     boolean deleteById(Long subjectId);
 

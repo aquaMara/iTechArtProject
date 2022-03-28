@@ -1,11 +1,9 @@
 package org.aquam.learnrest.exception;
 
-import org.aquam.learnrest.dto.UserDTO;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintViolation;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 public class AppResponse {

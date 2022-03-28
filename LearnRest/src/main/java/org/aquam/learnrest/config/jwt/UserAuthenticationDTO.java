@@ -1,7 +1,6 @@
 package org.aquam.learnrest.config.jwt;
 
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter

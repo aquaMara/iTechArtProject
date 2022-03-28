@@ -1,16 +1,15 @@
 package org.aquam.learnrest.model;
 
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 @Entity
 public class Section {
 
@@ -18,6 +17,11 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long sectionId;
     private String sectionName;
+
+    public Section(Long sectionId, String sectionName) {
+        this.sectionId = sectionId;
+        this.sectionName = sectionName;
+    }
 
     @ManyToOne
     private Subject subject;
@@ -36,5 +40,18 @@ public class Section {
                 "sectionId=" + sectionId +
                 ", sectionName='" + sectionName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(sectionName, section.sectionName) && Objects.equals(subject, section.subject);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sectionName, subject);
     }
 }

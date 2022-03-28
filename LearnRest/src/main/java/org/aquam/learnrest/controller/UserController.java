@@ -3,7 +3,6 @@ package org.aquam.learnrest.controller;
 import lombok.RequiredArgsConstructor;
 import org.aquam.learnrest.dto.UserDTO;
 import org.aquam.learnrest.model.AppUser;
-import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

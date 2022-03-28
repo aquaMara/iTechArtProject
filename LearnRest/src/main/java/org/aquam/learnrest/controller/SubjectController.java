@@ -5,15 +5,11 @@ import org.aquam.learnrest.dto.SubjectDTO;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.service.impl.SubjectServiceImpl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.List;
 
