@@ -41,6 +41,15 @@ public class AppUser implements UserDetails {
         this.enabled = true;
     }
 
+    public AppUser(Long userId, UserRole userRole, String username, String password, String name, String email) {
+        this.userId = userId;
+        this.userRole = userRole;
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+    }
+
     public AppUser(UserRole userRole, String username, String password, String name, String email) {
         this();
         this.userRole = userRole;
