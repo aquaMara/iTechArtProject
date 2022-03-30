@@ -5,6 +5,7 @@ import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.repository.SubjectRepository;
 import org.aquam.learnrest.service.SubjectService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -132,26 +133,31 @@ class SubjectServiceImplTest {
     }
 
     @Test
-    @DisplayName("updateById")
-    void updateByIdShouldReturnSubject() throws IOException {
-        Long subjectId = 1L;
-        String subjectName = "subject_name";
-        Subject subject = new Subject(1L, "subject_name", "filepath.jpg");
-        SubjectDTO newSubjectDTO = new SubjectDTO(null, "subjectDTO_name", "filepath.jpg");
-        Subject newSubject = new Subject(null, "subjectDTO_name", "filepath.jpg");
-
-        given(subjectRepository.findById(subjectId)).willReturn(Optional.of(subject));
-        given(subjectService.toSubject(newSubjectDTO)).willReturn(newSubject);
-        subjectService.updateById(subjectId, newSubjectDTO, multipartFile);
-        then(subjectRepository).should().save(subject);
+    @DisplayName("create")
+    void createShouldThrowConstraintViolationException() throws IOException {
+        SubjectDTO subjectDTO = new SubjectDTO(null, null, "filepath.jpg");
+        assertThrows(ConstraintViolationException.class,
+                () -> subjectService.toSubject(subjectDTO));
     }
 
     @Test
     @DisplayName("updateById")
-    void updateByIdShouldThrowConstraintViolationException() {
+    void updateByIdShouldReturnSubject() throws IOException {
         Long subjectId = 1L;
-        Subject subject = new Subject(subjectId, "subject_name", "filepath.jpg");
-        given(subjectRepository.findById(subjectId)).willReturn(Optional.of(subject));
+        String subjectName = "subject_name";
+        SubjectDTO newSubjectDTO = new SubjectDTO(null, "subjectDTO_name", "filepath.jpg");
+        Subject newSubject = new Subject(null, "subjectDTO_name", "filepath.jpg");
+
+        given(subjectService.toSubject(newSubjectDTO)).willReturn(newSubject);
+        subjectService.updateById(subjectId, newSubjectDTO, multipartFile);
+        then(subjectRepository).should().save(newSubject);
+    }
+
+    @Test
+    @DisplayName("updateById")
+    void updateByIdShouldThrowConstraintViolationException() throws IOException {
+        Long subjectId = 1L;
+        Subject newSubject = new Subject(subjectId, null, "filepath.jpg");
         SubjectDTO newSubjectDTO = new SubjectDTO(null, null, "filepath.jpg");
         assertThrows(ConstraintViolationException.class,
                 () -> subjectService.updateById(subjectId, newSubjectDTO, multipartFile));
@@ -181,6 +187,7 @@ class SubjectServiceImplTest {
     }
 
     @Test
+    @Disabled
     void toSubject() {
         SubjectDTO subjectDTO = new SubjectDTO(null, null, null);
         // Subject subject = new Subject(null, "subjectDTO_name", "filepath.jpg");

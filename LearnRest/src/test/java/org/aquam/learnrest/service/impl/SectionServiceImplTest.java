@@ -19,6 +19,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,14 +44,18 @@ class SectionServiceImplTest {
     @Test
     @DisplayName("findById")
     void findByIdShouldReturnSection() {
-        given(sectionRepository.findById(anyLong())).willReturn(java.util.Optional.of(new Section()));
-        sectionService.findById(anyLong());
-        then(sectionRepository).should().findById(anyLong());
+        Long sectionId = 1L;
+        Section section = new Section(sectionId, "section_name");
+        given(sectionRepository.findById(sectionId)).willReturn(java.util.Optional.of(section));
+        sectionService.findById(sectionId);
+        then(sectionRepository).should().findById(sectionId);
     }
 
     @Test
     @DisplayName("findById")
     void findByIdShouldThrowException() {
+        given(sectionRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class,
                 () -> sectionService.findById(anyLong()));
     }
@@ -58,7 +63,8 @@ class SectionServiceImplTest {
     @Test
     @DisplayName("findAll")
     void findAllShouldReturnListOfSections() {
-        given(sectionRepository.findAll()).willReturn(Arrays.asList(new Section(1L, "section_name")));
+        given(sectionRepository.findAll())
+                .willReturn(Arrays.asList(new Section(1L, "section_name")));
         sectionService.findAll();
         then(sectionRepository).should(times(2)).findAll();
     }
@@ -66,7 +72,6 @@ class SectionServiceImplTest {
     @Test
     @DisplayName("findAll")
     void findAllShouldThrowException() {
-        // given(sectionRepository.findAll()).willThrow(EntityNotFoundException.class);
         given(sectionRepository.findAll()).willReturn(new ArrayList<>());
         assertThrows(EntityNotFoundException.class,
                 () -> sectionService.findAll());
@@ -77,11 +82,7 @@ class SectionServiceImplTest {
     void createShouldReturnCreatedSection() {
         SectionDTO sectionDTO = new SectionDTO(null, "section_name", 1L);
         Section section = new Section(null, "section_name");
-        Subject subject = new Subject(1L, "subject_name", "filepath.jpg");
-        // *******
         given(modelMapper.map(sectionDTO, Section.class)).willReturn(section);
-        given(subjectService.findById(sectionDTO.getSubjectId())).willReturn(subject);
-        // *******
         sectionService.create(sectionDTO);
         then(sectionRepository).should().save(section);
     }
@@ -100,11 +101,7 @@ class SectionServiceImplTest {
         Long sectionId = 1L;
         SectionDTO newSectionDTO = new SectionDTO(sectionId, "section_name", 1L);
         Section newSection = new Section(sectionId, "section_name");
-        Subject subject = new Subject(1L, "subject_name", "filepath.jpg");
-        // *******
         given(modelMapper.map(newSectionDTO, Section.class)).willReturn(newSection);
-        given(subjectService.findById(newSectionDTO.getSubjectId())).willReturn(subject);
-        // *******
         sectionService.updateById(sectionId, newSectionDTO);
         then(sectionRepository).should().save(newSection);
     }
