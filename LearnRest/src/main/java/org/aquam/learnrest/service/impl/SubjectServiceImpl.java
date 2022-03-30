@@ -29,6 +29,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
+    private final ImageUploaderImpl imageUploader;
     public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/subject_images";
 
     private static Validator validator;
@@ -68,16 +69,21 @@ public class SubjectServiceImpl implements SubjectService {
         if (subjectRepository.findBySubjectName(subjectDTO.getSubjectName()).isPresent())
             throw new EntityExistsException("Subject with name: " + subjectDTO.getSubjectName() + " already exists");
         Subject subject = toSubject(subjectDTO);
+        String filepath = imageUploader.uploadImage(file, uploadDirectory);
         // subject.setFilePath(uploadImage(file));
         return subjectRepository.save(subject);
     }
 
     @Override   // без path variable и так не раб
     public Subject updateById(Long subjectId, SubjectDTO newSubjectDTO) {
+        /*
         Subject subject = findById(subjectId);
         Subject newSubject = toSubject(newSubjectDTO);
         subject.setSubjectName(newSubject.getSubjectName());
         return subjectRepository.save(subject);
+         */
+        Subject newSubject = toSubject(newSubjectDTO);
+        return subjectRepository.save(newSubject);
     }
 
     @Override

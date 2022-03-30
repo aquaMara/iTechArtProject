@@ -31,6 +31,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final ModelMapper modelMapper;
     private final UserServiceImpl userService;
     private final SectionServiceImpl sectionService;
+    private final ImageUploaderImpl imageUploader;
     public final String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/article_images";
 
     private static Validator validator;
@@ -59,11 +60,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Article create(ArticleDTO articleDTO, MultipartFile file) throws IOException {
         Article article = toArticle(articleDTO);
-        Section section = sectionService.findById(articleDTO.getSectionId());
-        article.setSection(section);
-        AppUser user = userService.findById(articleDTO.getUserId());
-        article.setUser(user);
-        article.setFilePath(uploadImage(file));
+        String filepath = imageUploader.uploadImage(file, uploadDirectory);
+        article.setFilePath(filepath);
         return articleRepository.save(article);
     }
 
@@ -105,6 +103,10 @@ public class ArticleServiceImpl implements ArticleService {
         if (!validationExceptions.isEmpty())
             throw new ConstraintViolationException(validationExceptions);
         Article article = modelMapper.map(articleDTO, Article.class);
+        Section section = sectionService.findById(articleDTO.getSectionId());
+        article.setSection(section);
+        AppUser user = userService.findById(articleDTO.getUserId());
+        article.setUser(user);
         return article;
         /*
         if (articleDTO.getLiterature() != null)
