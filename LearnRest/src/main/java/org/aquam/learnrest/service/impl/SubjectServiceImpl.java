@@ -52,11 +52,6 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<Subject> findAll() {
-        /*
-        if (!subjectRepository.findAll().isEmpty())
-            return subjectRepository.findAll();
-        throw new EntitiesNotFoundException("There are no subjects");
-         */
         if (subjectRepository.findAll().isEmpty())
             throw new EntitiesNotFoundException("There are no subjects");
         return subjectRepository.findAll();
@@ -65,24 +60,19 @@ public class SubjectServiceImpl implements SubjectService {
     // на фронт недейств пока файл не выбран
     @Override
     public Subject create(SubjectDTO subjectDTO, MultipartFile file) throws IOException {
-        Optional<Subject> s = subjectRepository.findBySubjectName(subjectDTO.getSubjectName());
         if (subjectRepository.findBySubjectName(subjectDTO.getSubjectName()).isPresent())
             throw new EntityExistsException("Subject with name: " + subjectDTO.getSubjectName() + " already exists");
         Subject subject = toSubject(subjectDTO);
         String filepath = imageUploader.uploadImage(file, uploadDirectory);
-        // subject.setFilePath(uploadImage(file));
+        subject.setFilePath(filepath);
         return subjectRepository.save(subject);
     }
 
     @Override   // без path variable и так не раб
-    public Subject updateById(Long subjectId, SubjectDTO newSubjectDTO) {
-        /*
-        Subject subject = findById(subjectId);
+    public Subject updateById(Long subjectId, SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
         Subject newSubject = toSubject(newSubjectDTO);
-        subject.setSubjectName(newSubject.getSubjectName());
-        return subjectRepository.save(subject);
-         */
-        Subject newSubject = toSubject(newSubjectDTO);
+        String filepath = imageUploader.uploadImage(file, uploadDirectory);
+        newSubject.setFilePath(filepath);
         return subjectRepository.save(newSubject);
     }
 
@@ -93,15 +83,6 @@ public class SubjectServiceImpl implements SubjectService {
         return true;
     }
 
-    @Override
-    public String uploadImage(MultipartFile file) throws IOException {
-        StringBuilder filename = new StringBuilder();
-        Path filenameAndPath = Paths.get(uploadDirectory, file.getOriginalFilename());
-        filename.append(file.getOriginalFilename());
-        Files.write(filenameAndPath, file.getBytes());
-        return filename.toString();
-    }
-
     public Subject toSubject(SubjectDTO subjectDTO) {
         Set<ConstraintViolation<SubjectDTO>> validationExceptions = validator.validate(subjectDTO);
         if (!validationExceptions.isEmpty())
@@ -110,8 +91,3 @@ public class SubjectServiceImpl implements SubjectService {
         return subject;
     }
 }
-
-        /*
-        if (subjectDTO == null)
-            throw new NullPointerException("Subject is null");
-         */

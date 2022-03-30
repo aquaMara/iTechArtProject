@@ -43,8 +43,8 @@ public class ArticleController {
 
     @PreAuthorize("hasRole('TEACHER')")
     @PutMapping("/{articleId}")
-    ResponseEntity<Article> updateArticle(@PathVariable Long articleId, ArticleDTO articleDTO) {
-        return new ResponseEntity<>(articleService.updateById(articleId, articleDTO), HttpStatus.OK);
+    ResponseEntity<Article> updateArticle(@PathVariable Long articleId, ArticleDTO articleDTO, MultipartFile file) throws IOException {
+        return new ResponseEntity<>(articleService.updateById(articleId, articleDTO, file), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('TEACHER')")

@@ -12,8 +12,6 @@ public interface ArticleService {
     Article findById(Long articleId);
     List<Article> findAll();
     Article create(ArticleDTO articleDTO, MultipartFile file) throws IOException;
-    Article updateById(Long articleId, ArticleDTO newArticle);
+    Article updateById(Long articleId, ArticleDTO newArticle, MultipartFile file) throws IOException;
     boolean deleteById(Long articleId);
-
-    String uploadImage(MultipartFile file) throws IOException;
 }

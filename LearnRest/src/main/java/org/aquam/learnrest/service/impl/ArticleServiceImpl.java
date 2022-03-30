@@ -66,20 +66,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article updateById(Long articleId, ArticleDTO newArticleDTO) {
+    public Article updateById(Long articleId, ArticleDTO newArticleDTO, MultipartFile file) throws IOException {
         Article article = findById(articleId);
         Article newArticle = toArticle(newArticleDTO);
-        Section section = sectionService.findById(newArticleDTO.getSectionId());
-        article.setSection(section);
-        AppUser user = userService.findById(newArticleDTO.getUserId());
-        article.setUser(user);
-        if (newArticle.getLiterature() != null)
-            article.setLiterature(newArticle.getLiterature());
-        if (newArticle.getLink() != null)
-            article.setLink(newArticle.getLink());
-        article.setHeading(newArticle.getHeading());
-        article.setContent(newArticleDTO.getContent());
-        return articleRepository.save(article);
+        String filepath = imageUploader.uploadImage(file, uploadDirectory);
+        newArticle.setFilePath(filepath);
+        return articleRepository.save(newArticle);
     }
 
     @Override
@@ -87,15 +79,6 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = findById(articleId);
         articleRepository.delete(article);
         return true;
-    }
-
-    @Override
-    public String uploadImage(MultipartFile file) throws IOException {
-        StringBuilder filename = new StringBuilder();
-        Path filenameAndPath = Paths.get(uploadDirectory, file.getOriginalFilename());
-        filename.append(file.getOriginalFilename());
-        Files.write(filenameAndPath, file.getBytes());
-        return filename.toString();
     }
 
     public Article toArticle(ArticleDTO articleDTO) {

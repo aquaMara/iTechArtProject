@@ -15,6 +15,7 @@ public class SubjectDTO {
     private Long subjectId;
     @NotBlank(message = "Can not be empty")
     private String subjectName;
+    private String filePath;
 
     @Override
     public boolean equals(Object o) {

@@ -40,8 +40,8 @@ public class SubjectController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{subjectId}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable Long subjectId, SubjectDTO newSubjectDTO) {
-        return new ResponseEntity<>(subjectService.updateById(subjectId, newSubjectDTO), HttpStatus.OK); // 200 for updates, 201 for created
+    public ResponseEntity<Subject> updateSubject(@PathVariable Long subjectId, SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
+        return new ResponseEntity<>(subjectService.updateById(subjectId, newSubjectDTO, file), HttpStatus.OK); // 200 for updates, 201 for created
     }
 
     @PreAuthorize("hasRole('ADMIN')")

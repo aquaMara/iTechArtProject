@@ -80,7 +80,3 @@ public class SectionServiceImpl implements SectionService {
         return section;
     }
 }
-/*
-if (sectionDTO.getSectionName() == null || sectionDTO.getSubjectId() == null)   //  || sectionDTO.getSubjectName() == null
-            throw new NullPointerException("Section or subject is null");
- */

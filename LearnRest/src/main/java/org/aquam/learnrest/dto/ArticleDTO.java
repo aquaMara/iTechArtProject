@@ -17,6 +17,7 @@ public class ArticleDTO {
     private String content;
     private String link;
     private String literature;
+    private String filePath;
 
     private Long sectionId;
     private Long userId;
