@@ -67,7 +67,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article updateById(Long articleId, ArticleDTO newArticleDTO, MultipartFile file) throws IOException {
-        Article article = findById(articleId);
+        // Article article = findById(articleId);
         Article newArticle = toArticle(newArticleDTO);
         String filepath = imageUploader.uploadImage(file, uploadDirectory);
         newArticle.setFilePath(filepath);
