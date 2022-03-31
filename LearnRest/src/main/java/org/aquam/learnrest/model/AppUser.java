@@ -6,10 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -34,6 +31,19 @@ public class AppUser implements UserDetails {
     private void addArticle(Article article) {
         this.allArticles.add(article);
         article.setUser(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppUser appUser = (AppUser) o;
+        return userRole == appUser.userRole && Objects.equals(username, appUser.username) && Objects.equals(password, appUser.password) && Objects.equals(name, appUser.name) && Objects.equals(email, appUser.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userRole, username, password, name, email);
     }
 
     public AppUser() {

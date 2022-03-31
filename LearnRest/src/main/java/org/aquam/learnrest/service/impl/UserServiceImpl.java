@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.*;
 import java.util.List;
@@ -66,8 +67,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public AppUser registerUser(UserDTO userDTO) {
-        AppUser user = (AppUser) loadUserByUsername(userDTO.getUsername());
-        AppUser newUser = toUser(userDTO);
+        // AppUser user = (AppUser) loadUserByUsername(userDTO.getUsername());
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent())
+            throw new EntityExistsException("User with username: " + userDTO.getUsername() + " already exists");
+        AppUser user = toUser(userDTO);
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
