@@ -51,6 +51,8 @@ class ArticleServiceImplTest {
     @Mock
     private MultipartFile multipartFile;
 
+    public final String uploadDirectory = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\article_images";
+
     @Test
     @DisplayName("findById")
     void findByIdShouldReturnArticle() {
@@ -124,10 +126,8 @@ class ArticleServiceImplTest {
         ArticleDTO articleDTO = new ArticleDTO(null, "heading", "content", null, null,"filepath.jpg", 1L, 1L);
         Article article = new Article(null, "heading", "content", null, null, "filePath.jpg");
 
-        // verify(articleRepository).save(article);
-        given(articleService.toArticle(articleDTO)).willReturn(article);
         given(myModelMapper.map(articleDTO, Article.class)).willReturn(article);
-        given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
+        //given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
         articleService.create(articleDTO, multipartFile);
         then(articleRepository).should().save(article);
     }
@@ -137,7 +137,8 @@ class ArticleServiceImplTest {
         Article newArticle = new Article(1L, "content", "heading", "link", "literature", "filepath.jpg");
         ArticleDTO newArticleDTO = new ArticleDTO(1L, "content", "heading", "link", "literature", "filepath.jpg", 2L, 3L);
         given(myModelMapper.map(newArticleDTO, Article.class)).willReturn(newArticle);
-        given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
+        // given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
+        // given(imageUploader.uploadImage(multipartFile, uploadDirectory)).willReturn("anyString()");
         articleService.updateById(1L, newArticleDTO, multipartFile);
         then(articleRepository).should().save(newArticle);
     }

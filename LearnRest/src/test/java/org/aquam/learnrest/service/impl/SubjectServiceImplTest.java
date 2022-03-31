@@ -116,7 +116,7 @@ class SubjectServiceImplTest {
         String newSubjectName = "subject_name";
         Subject subject = new Subject(null, newSubjectName, "filepath.jpg");
         SubjectDTO subjectDTO = new SubjectDTO(null, newSubjectName, "filepath.jpg");
-        given(subjectService.toSubject(subjectDTO)).willReturn(subject);
+        given(modelMapper.map(subjectDTO, Subject.class)).willReturn(subject);
         given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
         subjectService.create(subjectDTO, multipartFile);
         then(subjectRepository).should().save(subject);
@@ -147,8 +147,7 @@ class SubjectServiceImplTest {
         String subjectName = "subject_name";
         SubjectDTO newSubjectDTO = new SubjectDTO(null, "subjectDTO_name", "filepath.jpg");
         Subject newSubject = new Subject(null, "subjectDTO_name", "filepath.jpg");
-
-        given(subjectService.toSubject(newSubjectDTO)).willReturn(newSubject);
+        given(modelMapper.map(newSubjectDTO, Subject.class)).willReturn(newSubject);
         subjectService.updateById(subjectId, newSubjectDTO, multipartFile);
         then(subjectRepository).should().save(newSubject);
     }
@@ -168,7 +167,6 @@ class SubjectServiceImplTest {
         Long subjectId = 1L;
         Subject subject = new Subject(subjectId, "subject_name", "filepath.jpg");
         given(subjectRepository.findById(subjectId))
-                .willReturn(Optional.of(subject))
                 .willReturn(Optional.of(subject));
         subjectService.deleteById(subjectId);
         then(subjectRepository).should().delete(subject);
