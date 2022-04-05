@@ -5,6 +5,7 @@ import org.aquam.learnrest.dto.SubjectDTO;
 import org.aquam.learnrest.model.Subject;
 import org.aquam.learnrest.service.impl.SubjectServiceImpl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,13 @@ public class SubjectController {
 
     private final SubjectServiceImpl subjectService;
 
-    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<List<Subject>> getAllSubjects() {
         return new ResponseEntity<>(subjectService.findAll(), HttpStatus.OK);   // 200
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @GetMapping("/{subjectId}")
     public ResponseEntity<Subject> getSubjectById(@PathVariable Long subjectId) {
         return new ResponseEntity<>(subjectService.findById(subjectId), HttpStatus.OK); // 200
@@ -34,20 +35,25 @@ public class SubjectController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
-    public ResponseEntity<Subject> createSubject(SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
-        return new ResponseEntity<>(subjectService.create(newSubjectDTO, file), HttpStatus.CREATED);  // 201
+    public ResponseEntity<Subject> createSubject(@RequestBody SubjectDTO newSubjectDTO) throws IOException {
+        return new ResponseEntity<>(subjectService.create(newSubjectDTO), HttpStatus.CREATED);  // 201
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/upload/{subjectId}")
+    public ResponseEntity<Subject> addFile(@PathVariable Long subjectId, @RequestParam(value = "data") MultipartFile file) throws IOException {
+        return new ResponseEntity<>(subjectService.addFile(subjectId, file), HttpStatus.OK);  // 200
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{subjectId}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable Long subjectId, SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
-        return new ResponseEntity<>(subjectService.updateById(subjectId, newSubjectDTO, file), HttpStatus.OK); // 200 for updates, 201 for created
+    public ResponseEntity<Subject> updateSubject(@PathVariable Long subjectId, @RequestBody SubjectDTO newSubjectDTO) {
+        return new ResponseEntity<>(subjectService.updateById(subjectId, newSubjectDTO), HttpStatus.OK); // 200 for updates, 201 for created
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{subjectId}")  // HttpStatus.ACCEPTED = 202
     public ResponseEntity<Boolean> deleteSubjectById(@PathVariable Long subjectId) {
-        System.out.println(subjectId);
         return new ResponseEntity(subjectService.deleteById(subjectId), HttpStatus.OK);   // 204 - No Content
     }
 
@@ -57,3 +63,20 @@ public class SubjectController {
 get, post = /api/articles
 get, put, delete = /api/articles/{id}
  */
+
+    /*
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{subjectId}")
+    public ResponseEntity<Subject> updateSubject(@PathVariable Long subjectId, SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
+        return new ResponseEntity<>(subjectService.updateById(subjectId, newSubjectDTO, file), HttpStatus.OK); // 200 for updates, 201 for created
+    }
+     */
+
+    /*
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("")
+    public ResponseEntity<Subject> createSubject(SubjectDTO newSubjectDTO, MultipartFile file) throws IOException {
+        Subject s = subjectService.create(newSubjectDTO, file);
+        return new ResponseEntity<>(subjectService.create(newSubjectDTO, file), HttpStatus.CREATED);  // 201
+    }
+     */

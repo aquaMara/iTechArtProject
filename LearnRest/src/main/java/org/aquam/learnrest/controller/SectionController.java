@@ -18,13 +18,13 @@ public class SectionController {
 
     private final SectionServiceImpl sectionService;
 
-    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @GetMapping("")
     public ResponseEntity<List<Section>> getAllSections() {
         return new ResponseEntity<>(sectionService.findAll(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @GetMapping("/{sectionId}")
     public ResponseEntity<Section> getSectionById(@PathVariable Long sectionId) {
         return new ResponseEntity<>(sectionService.findById(sectionId), HttpStatus.OK);
@@ -32,13 +32,13 @@ public class SectionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
-    public ResponseEntity<Section> createSection(SectionDTO sectionDTO) {
+    public ResponseEntity<Section> createSection(@RequestBody SectionDTO sectionDTO) {
         return new ResponseEntity<>(sectionService.create(sectionDTO), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{sectionId}")
-    public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, SectionDTO newSectionDTO) {
+    public ResponseEntity<Section> updateSection(@PathVariable Long sectionId, @RequestBody SectionDTO newSectionDTO) {
         return new ResponseEntity<>(sectionService.updateById(sectionId, newSectionDTO), HttpStatus.OK);
     }
 
