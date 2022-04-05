@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
+//@SpringBootTest
 class ArticleServiceImplTest {
 
     @Mock
@@ -93,8 +95,17 @@ class ArticleServiceImplTest {
                 () -> articleService.findAll());
     }
 
-    // need to check
-    // ??? не понимаю ошибку article is null
+    @Test
+    @Disabled
+    @DisplayName("create")
+    void createWithoutMultipartShouldReturnArticle() throws IOException {
+        Article article = new Article(null, "heading", "content", "link", "literature", "filePath.jpg");
+        ArticleDTO articleDTO = new ArticleDTO(null, "heading", "content", "link", "literature", "filepath.jpg", 1L, 1L);
+        given(myModelMapper.map(articleDTO, Article.class)).willReturn(article);
+        articleService.create(articleDTO);
+        then(articleRepository).should().save(article);
+    }
+
     @Test
     @Disabled
     @DisplayName("create")
@@ -103,7 +114,7 @@ class ArticleServiceImplTest {
         ArticleDTO articleDTO = new ArticleDTO(null, "heading", "content", "link", "literature", "filepath.jpg", 1L, 1L);
 
         given(myModelMapper.map(articleDTO, Article.class)).willReturn(article);
-        given(articleService.toArticle(articleDTO)).willReturn(article);
+        //given(articleService.toArticle(articleDTO)).willReturn(article);
         given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
 
         articleService.create(articleDTO, multipartFile);
@@ -127,7 +138,7 @@ class ArticleServiceImplTest {
         Article article = new Article(null, "heading", "content", null, null, "filePath.jpg");
 
         given(myModelMapper.map(articleDTO, Article.class)).willReturn(article);
-        //given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
+        given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
         articleService.create(articleDTO, multipartFile);
         then(articleRepository).should().save(article);
     }
@@ -140,6 +151,18 @@ class ArticleServiceImplTest {
         // given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
         // given(imageUploader.uploadImage(multipartFile, uploadDirectory)).willReturn("anyString()");
         articleService.updateById(1L, newArticleDTO, multipartFile);
+        then(articleRepository).should().save(newArticle);
+    }
+
+    @Test
+    void updateByIdWithoutMultipartShouldReturnArticle() throws IOException {
+        Long articleId = 1L;
+        Article article = new Article(articleId, "content", "heading", "link", "literature", "filepath.jpg");
+        Article newArticle = new Article(1L, "content", "heading", "link", "literature", "filepath.jpg");
+        ArticleDTO newArticleDTO = new ArticleDTO(1L, "content", "heading", "link", "literature", "filepath.jpg", 2L, 3L);
+        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+        given(myModelMapper.map(newArticleDTO, Article.class)).willReturn(newArticle);
+        articleService.updateById(1L, newArticleDTO);
         then(articleRepository).should().save(newArticle);
     }
 

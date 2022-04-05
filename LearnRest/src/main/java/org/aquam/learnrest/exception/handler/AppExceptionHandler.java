@@ -1,10 +1,19 @@
 package org.aquam.learnrest.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -14,7 +23,7 @@ import java.time.ZonedDateTime;
 
 @ControllerAdvice
 // @RestControllerAdvice
-public class AppExceptionHandler {
+public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<AppResponse> handleUsernameNotFoundException(UsernameNotFoundException exception) {
@@ -58,13 +67,23 @@ public class AppExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // error 403
-    @ExceptionHandler(JwtAuthenticationException.class)
-    public ResponseEntity<AppResponse> handleJwtAuthenticationException(JwtAuthenticationException exception) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<AppResponse> handleBadCredentialsException(BadCredentialsException exception) {
         AppResponse response = new AppResponse(exception.getMessage(), ZonedDateTime.now(), HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<AppResponse> handleJwtException(JwtException exception) {
+        AppResponse response = new AppResponse("Token is not valid", ZonedDateTime.now(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<AppResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
+        AppResponse response = new AppResponse("Token is null", ZonedDateTime.now(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
 }
 
 /*

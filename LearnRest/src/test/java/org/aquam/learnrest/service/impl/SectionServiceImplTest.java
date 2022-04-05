@@ -28,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+// на права
 @ExtendWith(MockitoExtension.class)
 class SectionServiceImplTest {
 
@@ -99,8 +100,10 @@ class SectionServiceImplTest {
     @DisplayName("update")
     void updateByIdShouldReturnUpdatedSection() {
         Long sectionId = 1L;
+        Section section = new Section(sectionId, "section_name");
         SectionDTO newSectionDTO = new SectionDTO(sectionId, "section_name", 1L);
         Section newSection = new Section(sectionId, "section_name");
+        given(sectionRepository.findById(sectionId)).willReturn(Optional.of(section));
         given(modelMapper.map(newSectionDTO, Section.class)).willReturn(newSection);
         sectionService.updateById(sectionId, newSectionDTO);
         then(sectionRepository).should().save(newSection);

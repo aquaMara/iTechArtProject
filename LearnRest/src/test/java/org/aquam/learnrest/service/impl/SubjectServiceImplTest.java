@@ -117,6 +117,7 @@ class SubjectServiceImplTest {
         Subject subject = new Subject(null, newSubjectName, "filepath.jpg");
         SubjectDTO subjectDTO = new SubjectDTO(null, newSubjectName, "filepath.jpg");
         given(modelMapper.map(subjectDTO, Subject.class)).willReturn(subject);
+        // ***********************************************************************************
         given(imageUploader.uploadImage(any(MultipartFile.class), anyString())).willReturn(anyString());
         subjectService.create(subjectDTO, multipartFile);
         then(subjectRepository).should().save(subject);
@@ -160,6 +161,19 @@ class SubjectServiceImplTest {
         SubjectDTO newSubjectDTO = new SubjectDTO(null, null, "filepath.jpg");
         assertThrows(ConstraintViolationException.class,
                 () -> subjectService.updateById(subjectId, newSubjectDTO, multipartFile));
+    }
+
+    @Test
+    @DisplayName("updateById")
+    void updateByIdWithoutMultipart() {
+        Long subjectId = 1L;
+        Subject subject = new Subject(subjectId, "subject_name", "filepath.jpg");
+        given(subjectRepository.findById(subjectId)).willReturn(Optional.of(subject));
+        Subject newSubject = new Subject(subjectId, "subject_name2", "filepath.jpg");
+        SubjectDTO newSubjectDTO = new SubjectDTO(subjectId, "subject_name2", "filepath.jpg");
+        given(modelMapper.map(newSubjectDTO, Subject.class)).willReturn(newSubject);
+        subjectService.updateById(subjectId, newSubjectDTO);
+        then(subjectRepository).should().save(newSubject);
     }
 
     @Test
