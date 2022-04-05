@@ -3,6 +3,7 @@ package org.aquam.learnrest.config.jwt;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.aquam.learnrest.exception.JwtAuthenticationException;
+import org.aquam.learnrest.exception.handler.AppExceptionHandler;
 import org.aquam.learnrest.model.UserRole;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AppExceptionHandler appExceptionHandler;
 
     @PostConstruct
     protected void init() {
@@ -73,6 +75,7 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer "))
             return bearerToken.substring(7, bearerToken.length());
+
         return null;
     }
 
@@ -82,9 +85,24 @@ public class JwtTokenProvider {
             if (claims.getBody().getExpiration().before(new Date()))
                 return false;
             return true;
-        } catch (JwtException | IllegalArgumentException exception) {
-            throw new JwtAuthenticationException("JWT token is expired or invalid");
+        } catch (JwtException exception) {
+            // throw new JwtAuthenticationException("");
+            // appExceptionHandler.handleRuntimeException(exception);
+        } catch (IllegalArgumentException exception) {
+            // appExceptionHandler.handleRuntimeException(exception);
+            // throw new IllegalStateException("");
         }
+        return false;
+        /*
+        catch (JwtException | IllegalArgumentException exception) {
+            //} catch (JwtException Exception exception) {
+            // exception.printStackTrace();
+            appExceptionHandler.handleJwtException((JwtException) exception);
+            // throw new JwtAuthenticationException("JWT token is expired or invalid");
+            // throw new AuthenticationException("JWT token is invalid");
+            // throw new AccessDeniedException("DENIED");
+        }
+         */
     }
 
     private List<String> getRoleNames(List<UserRole> roles) {
