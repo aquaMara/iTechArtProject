@@ -1,12 +1,14 @@
 package org.aquam.learnrest.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.aquam.learnrest.dto.UserDTO;
 import org.aquam.learnrest.exception.EntitiesNotFoundException;
 import org.aquam.learnrest.model.AppUser;
 import org.aquam.learnrest.repository.UserRepository;
 import org.aquam.learnrest.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +22,7 @@ import javax.validation.*;
 import java.util.List;
 import java.util.Set;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class UserServiceImpl implements UserService, UserDetailsService {

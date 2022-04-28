@@ -66,12 +66,33 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public Article create(ArticleDTO articleDTO) {
+        Article article = toArticle(articleDTO);
+        return articleRepository.save(article);
+    }
+
+    @Override
+    public Article addFile(Long articleId, MultipartFile file) throws IOException {
+        Article article = findById(articleId);
+        String filepath = imageUploader.uploadImage(file, uploadDirectory);
+        article.setFilePath(filepath);
+        return articleRepository.save(article);
+    }
+
+    @Override
     public Article updateById(Long articleId, ArticleDTO newArticleDTO, MultipartFile file) throws IOException {
         Article article = findById(articleId);
         Article newArticle = toArticle(newArticleDTO);
         String filepath = imageUploader.uploadImage(file, uploadDirectory);
         newArticle.setFilePath(filepath);
         return articleRepository.save(newArticle);
+    }
+
+    @Override
+    public Article updateById(Long articleId, ArticleDTO newArticleDTO) {
+        Article article = findById(articleId);
+        Article newArticle = toArticle(newArticleDTO);
+        return articleRepository.save(article);
     }
 
     @Override

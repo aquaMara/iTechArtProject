@@ -54,6 +54,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public Section updateById(Long sectionId, SectionDTO newSectionDTO) {
+        Section section = findById(sectionId);
         Section newSection = toSection(newSectionDTO);
         return sectionRepository.save(newSection);
         //Section section = findById(sectionId);

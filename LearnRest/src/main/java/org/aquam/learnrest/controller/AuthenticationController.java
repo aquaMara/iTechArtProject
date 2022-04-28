@@ -11,9 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +25,8 @@ public class AuthenticationController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
 
-    @GetMapping("")
-    public ResponseEntity login(UserAuthenticationDTO userAuthenticationDTO) {
+    @PostMapping("")
+    public ResponseEntity login(@RequestBody UserAuthenticationDTO userAuthenticationDTO) {
         try {
             String username = userAuthenticationDTO.getUsername();
             String password = userAuthenticationDTO.getPassword();

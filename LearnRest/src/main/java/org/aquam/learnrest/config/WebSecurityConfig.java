@@ -1,12 +1,18 @@
 package org.aquam.learnrest.config;
 
 import lombok.RequiredArgsConstructor;
+import org.aquam.learnrest.config.jwt.FilterChainExceptionHandler;
 import org.aquam.learnrest.config.jwt.JwtConfigurer;
 import org.aquam.learnrest.config.jwt.JwtTokenProvider;
+import org.aquam.learnrest.exception.handler.AppExceptionHandler;
+import org.aquam.learnrest.repository.UserRepository;
 import org.aquam.learnrest.service.impl.UserServiceImpl;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -21,17 +27,31 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 import java.util.Arrays;
 
+//@ComponentScan({"com.delivery.request"})
+//@EntityScan("com.delivery.domain")
+//@EnableJpaRepositories("com.delivery.repository")
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@ComponentScan("org.aquam")
+// @EnableJpaRepositories
+//@EntityScan("org.aquam.model")
+@EnableJpaRepositories("org.aquam.learnrest.repository")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     private final UserServiceImpl userService;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationSuccessHandler SuccessLoginHandler;
     private final JwtTokenProvider jwtTokenProvider;
+
+    // private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
+    // private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    // private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    // private final AppExceptionHandler appExceptionHandler;
+    private final FilterChainExceptionHandler filterChainExceptionHandler;
 
     // hasAuthority("ROLE_ADMIN") = hasRole("ADMIN")
     @Override
@@ -39,10 +59,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/learn/login", "/learn/register").permitAll();
-        http.apply(new JwtConfigurer(jwtTokenProvider));
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/learn/register").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/learn/login").permitAll();
+        // http.exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler);
+        http.apply(new JwtConfigurer(jwtTokenProvider, filterChainExceptionHandler));
+        // http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
+        // http.exceptionHandling()
+        //    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
     }
+
+
 
     @Bean
     @Override
@@ -63,13 +90,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return daoAuthenticationProvider;
     }
 
-
-
     @Bean
     public FilterRegistrationBean hiddenHttpMethodFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new HiddenHttpMethodFilter());
         filterRegistrationBean.setUrlPatterns(Arrays.asList("/*"));
         return filterRegistrationBean;
     }
+
+
 
 }

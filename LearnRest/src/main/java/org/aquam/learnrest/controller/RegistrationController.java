@@ -6,11 +6,12 @@ import org.aquam.learnrest.model.AppUser;
 import org.aquam.learnrest.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
 import java.io.IOException;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/learn/register")
@@ -19,8 +20,8 @@ public class RegistrationController {
 
     private final UserServiceImpl userService;
 
-    @GetMapping("")
-    public ResponseEntity<AppUser> createUser(UserDTO userDTO) throws IOException {
+    @PostMapping(path = "")
+    public ResponseEntity<AppUser> createUser(@RequestBody UserDTO userDTO) throws IOException {
         return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.CREATED);
     }
 

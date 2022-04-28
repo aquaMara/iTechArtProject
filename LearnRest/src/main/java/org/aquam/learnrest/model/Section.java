@@ -23,6 +23,8 @@ public class Section {
         this.sectionName = sectionName;
     }
 
+
+
     @ManyToOne
     private Subject subject;
 
@@ -42,16 +44,17 @@ public class Section {
                 '}';
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;
-        return Objects.equals(sectionName, section.sectionName) && Objects.equals(subject, section.subject);
+        return Objects.equals(sectionName, section.sectionName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sectionName, subject);
+        return Objects.hash(sectionName);
     }
 }
